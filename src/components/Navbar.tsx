@@ -9,6 +9,7 @@ const NAV_LINKS = [
     { name: 'GALERI', to: '/gallery' },
     { name: 'MEDIA', to: '/media' },
     { name: 'JADWAL', to: '/schedule' },
+    { name: 'LIVE', to: '/live' },
 ];
 
 export default function Navbar() {

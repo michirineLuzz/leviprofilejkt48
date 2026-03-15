@@ -275,9 +275,27 @@ export default function Admin() {
                 Kelola gallery, media YouTube, artikel, hashtag, dan statistik perform Levi dari satu tempat.
               </p>
             </div>
-            <button type="button" onClick={handleLogout} className="btn btn-secondary">
-              <LogOut style={{ width: 18, height: 18 }} /> Keluar
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <button 
+                type="button" 
+                onClick={async () => {
+                  if (confirm('Ini akan memasukkan semua data bawaan Levi ke Supabase. Lanjutkan?')) {
+                    await handleImportDefaults('gallery');
+                    await handleImportDefaults('media');
+                    await handleImportDefaults('hashtags');
+                    await handleImportDefaults('metrics');
+                    setStatusMessage('Semua data default berhasil di-import!');
+                  }
+                }} 
+                className="btn btn-secondary" 
+                style={{ background: 'var(--c-white)' }}
+              >
+                <Sparkles style={{ width: 18, height: 18, color: 'var(--c-pink)' }} /> Import Semua Data Default
+              </button>
+              <button type="button" onClick={handleLogout} className="btn btn-secondary">
+                <LogOut style={{ width: 18, height: 18 }} /> Keluar
+              </button>
+            </div>
           </div>
           {statusMessage && <p style={{ marginTop: '1rem', fontWeight: 700, color: 'var(--c-pink)' }}>{statusMessage}</p>}
         </section>

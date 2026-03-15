@@ -13,7 +13,6 @@ import {
     UserRound,
 } from 'lucide-react';
 import { MEMBER } from '../data';
-import { fetchLeviLiveStatus, type LiveStatus } from '../lib/live';
 
 function Ticker() {
     const items = ['MICHELLE LEVIA', 'JKT48', 'TEAM PASSION', 'GEN 12'];
@@ -79,6 +78,14 @@ const NAV_CARDS = [
         color: 'var(--c-yellow)',
         shadow: '#ffe89c',
     },
+    {
+        to: '/live',
+        title: 'Live',
+        desc: 'Cek status live Levi di IDN atau Showroom.',
+        icon: <Radio style={{ width: 28, height: 28 }} />,
+        color: '#ff8fb1',
+        shadow: '#ffd1df',
+    },
 ];
 
 
@@ -87,32 +94,6 @@ export default function Home() {
     const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
     const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '12%']);
     const badgeY = useTransform(scrollYProgress, [0, 1], ['0%', '-10%']);
-    const [liveStatus, setLiveStatus] = useState<LiveStatus>({ isLive: false, platform: null });
-
-    useEffect(() => {
-        let isMounted = true;
-
-        async function loadLiveStatus() {
-            try {
-                const status = await fetchLeviLiveStatus(['Levi', 'Michelle Levia', 'jkt48_levi', 'JKT48_Levi']);
-                if (isMounted) {
-                    setLiveStatus(status);
-                }
-            } catch {
-                if (isMounted) {
-                    setLiveStatus({ isLive: false, platform: null });
-                }
-            }
-        }
-
-        loadLiveStatus();
-        const intervalId = window.setInterval(loadLiveStatus, 60000);
-
-        return () => {
-            isMounted = false;
-            window.clearInterval(intervalId);
-        };
-    }, []);
 
     return (
         <main style={{ minHeight: '100vh', overflow: 'hidden' }}>
@@ -215,18 +196,6 @@ export default function Home() {
                                     >
                                         <Star style={{ width: 14, height: 14 }} /> {MEMBER.team}
                                     </motion.span>
-                                    <motion.span
-                                        variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-                                        className="pill"
-                                        style={{
-                                            background: liveStatus.isLive ? '#ffecf1' : 'var(--c-white)',
-                                            color: 'var(--c-text)',
-                                            boxShadow: liveStatus.isLive ? '3px 3px 0px var(--c-pink)' : undefined,
-                                        }}
-                                    >
-                                        <Radio style={{ width: 14, height: 14, color: liveStatus.isLive ? 'var(--c-pink)' : 'var(--c-text-muted)' }} />
-                                        {liveStatus.isLive ? `Live di ${liveStatus.platform}` : 'Offline'}
-                                    </motion.span>
                                 </motion.div>
 
                                 <motion.p
@@ -276,64 +245,6 @@ export default function Home() {
                                     Selamat datang di archive Levi! Tempat di mana kamu bisa kepoin profil, lihat galeri, cek berbagai konten, sampai mantau jadwal shownya.
                                 </motion.p>
 
-                                <motion.div
-                                    initial={{ opacity: 0, y: 14 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.46 }}
-                                    className="card-bubbly"
-                                    style={{
-                                        padding: '1rem 1.1rem',
-                                        marginBottom: '1.4rem',
-                                        background: liveStatus.isLive ? '#fff1f6' : 'var(--c-white)',
-                                        boxShadow: `8px 8px 0px ${liveStatus.isLive ? 'var(--c-pink-light)' : 'var(--c-blue)'}`,
-                                    }}
-                                >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                                        <div>
-                                            <p className="subhead" style={{ marginBottom: '0.25rem', color: liveStatus.isLive ? 'var(--c-pink)' : 'var(--c-text-muted)' }}>
-                                                Live Status
-                                            </p>
-                                            <p style={{ fontWeight: 800 }}>
-                                                {liveStatus.isLive
-                                                    ? `Levi lagi live di ${liveStatus.platform}`
-                                                    : 'Levi lagi belum live sekarang'}
-                                            </p>
-                                            {liveStatus.isLive && liveStatus.title && (
-                                                <p style={{ marginTop: '0.3rem', fontWeight: 600, color: 'var(--c-text-muted)' }}>
-                                                    {liveStatus.title}
-                                                </p>
-                                            )}
-                                        </div>
-                                        {liveStatus.isLive && liveStatus.url ? (
-                                            <motion.a
-                                                href={liveStatus.url}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                whileHover={{ y: -4 }}
-                                                whileTap={{ y: 2 }}
-                                                className="btn btn-primary"
-                                            >
-                                                Tonton Levi Live <ArrowRight style={{ strokeWidth: 3 }} />
-                                            </motion.a>
-                                        ) : (
-                                            <div
-                                                style={{
-                                                    display: 'inline-flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.55rem',
-                                                    padding: '0.75rem 1rem',
-                                                    borderRadius: '999px',
-                                                    border: '3px solid var(--c-text)',
-                                                    background: 'var(--c-bg)',
-                                                    fontWeight: 800,
-                                                }}
-                                            >
-                                                <Radio style={{ width: 16, height: 16 }} />
-                                                Standby aja dulu
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
 
                                 <motion.div
                                     initial={{ opacity: 0, y: 12 }}
@@ -343,12 +254,12 @@ export default function Home() {
                                 >
                                     <motion.div whileHover={{ y: -4 }} whileTap={{ y: 2 }}>
                                         <Link to="/about" className="btn btn-primary">
-                                            Explore Levi <ArrowRight style={{ strokeWidth: 3 }} />
+                                            About Levi <ArrowRight style={{ strokeWidth: 3 }} />
                                         </Link>
                                     </motion.div>
                                     <motion.div whileHover={{ y: -4 }} whileTap={{ y: 2 }}>
                                         <Link to="/gallery" className="btn btn-secondary">
-                                            Lihat Galeri
+                                            Galeri
                                         </Link>
                                     </motion.div>
                                 </motion.div>

@@ -9,6 +9,7 @@ import Media from './pages/Media';
 import Schedule from './pages/Schedule';
 import NotFound from './pages/NotFound';
 import Admin from './pages/Admin';
+import Live from './pages/Live';
 
 /* Scroll to top on route change */
 function ScrollToTop() {
@@ -28,6 +29,7 @@ function Layout() {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/media" element={<Media />} />
         <Route path="/schedule" element={<Schedule />} />
+        <Route path="/live" element={<Live />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
