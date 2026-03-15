@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { motion } from 'motion/react';
-import { ImagePlus, Hash, LayoutDashboard, LogOut, Newspaper, Save, Sparkles, Trash2, Video } from 'lucide-react';
+import { ImagePlus, Hash, LayoutDashboard, LogOut, Newspaper, Save, Sparkles, Trash2, Video, Palette } from 'lucide-react';
 import {
   fetchGalleryItems,
   fetchHashtags,
@@ -21,6 +21,7 @@ import {
   type ShowMetricItem,
 } from '../lib/cms';
 import { getSupabaseClient, hasSupabaseConfig } from '../lib/supabase';
+import { useTheme } from '../contexts/ThemeContext';
 
 type SessionState = 'checking' | 'signed_out' | 'signed_in';
 
@@ -98,6 +99,7 @@ function SectionShell({
 
 export default function Admin() {
   const supabase = getSupabaseClient();
+  const { themeColor, setThemeColor, availableColors } = useTheme();
   const [sessionState, setSessionState] = useState<SessionState>('checking');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -171,15 +173,16 @@ export default function Admin() {
     await supabase.auth.signOut();
   }
 
-  async function runSave(action: () => Promise<void>, successMessage: string) {
+  async function runSave(action: () => Promise<void>, successMessage: string): Promise<boolean> {
     try {
       setIsSaving(true);
       setStatusMessage(null);
       await action();
-      await reloadAll();
       setStatusMessage(successMessage);
+      return true;
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Terjadi error saat menyimpan');
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -247,6 +250,63 @@ export default function Admin() {
           {statusMessage && <p style={{ marginTop: '1rem', fontWeight: 700, color: 'var(--c-pink)' }}>{statusMessage}</p>}
         </section>
 
+        <SectionShell title="Theme Color" description="Pilih warna tema untuk website Levi." icon={<Palette style={{ width: 22, height: 22 }} />}>
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            <p style={{ fontWeight: 600, color: 'var(--c-text-muted)' }}>
+              Pilih warna tema yang akan digunakan di seluruh website. Perubahan akan langsung terlihat.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.8rem' }}>
+              {availableColors.map((color) => (
+                <button
+                  key={color.value}
+                  type="button"
+                  onClick={() => setThemeColor(color.value)}
+                  style={{
+                    padding: '1rem',
+                    border: `3px solid ${themeColor === color.value ? 'var(--c-text)' : 'var(--c-gray)'}`,
+                    borderRadius: '16px',
+                    background: color.value,
+                    color: 'white',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: themeColor === color.value ? '5px 5px 0px var(--c-text)' : '3px 3px 0px var(--c-gray)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                    e.currentTarget.style.boxShadow = themeColor === color.value ? '7px 7px 0px var(--c-text)' : '5px 5px 0px var(--c-gray)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translate(0, 0)';
+                    e.currentTarget.style.boxShadow = themeColor === color.value ? '5px 5px 0px var(--c-text)' : '3px 3px 0px var(--c-gray)';
+                  }}
+                >
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'white', display: 'grid', placeItems: 'center' }}>
+                    <Palette style={{ width: 20, height: 20, color: color.value }} />
+                  </div>
+                  <span style={{ fontSize: '0.85rem', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{color.name}</span>
+                </button>
+              ))}
+            </div>
+            <div style={{ marginTop: '0.5rem', padding: '1rem', background: 'var(--c-bg-surface)', border: '2px solid var(--c-text)', borderRadius: '12px' }}>
+              <p style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Current Theme Color:</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                <div style={{ width: 48, height: 48, borderRadius: '12px', background: themeColor, border: '3px solid var(--c-text)' }} />
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: '1.1rem' }}>{themeColor}</p>
+                  <p style={{ fontWeight: 600, color: 'var(--c-text-muted)', fontSize: '0.9rem' }}>
+                    {availableColors.find(c => c.value === themeColor)?.name || 'Custom Color'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionShell>
+
         <SectionShell title="Gallery" description="Tambah atau edit gambar gallery Levi." icon={<ImagePlus style={{ width: 22, height: 22 }} />}>
           <div style={{ display: 'grid', gap: '1rem' }}>
             {galleryItems.map((item, index) => (
@@ -260,7 +320,11 @@ export default function Admin() {
                   <button type="button" className="btn btn-primary" disabled={isSaving} onClick={() => runSave(() => saveGalleryItem(item), 'Gallery berhasil disimpan.')}>
                     <Save style={{ width: 18, height: 18 }} /> Simpan
                   </button>
-                  <button type="button" className="btn btn-secondary" disabled={isSaving} onClick={() => runSave(() => removeGalleryItem(item.id), 'Gallery berhasil dihapus.')}>
+                  <button type="button" className="btn btn-secondary" disabled={isSaving} onClick={async () => {
+                    if (await runSave(() => removeGalleryItem(item.id), 'Gallery berhasil dihapus.')) {
+                      setGalleryItems((current) => current.filter((entry) => entry.id !== item.id));
+                    }
+                  }}>
                     <Trash2 style={{ width: 18, height: 18 }} /> Hapus
                   </button>
                 </div>
@@ -300,7 +364,11 @@ export default function Admin() {
                   <button type="button" className="btn btn-primary" disabled={isSaving} onClick={() => runSave(() => saveMediaItem(item), 'Media berhasil disimpan.')}>
                     <Save style={{ width: 18, height: 18 }} /> Simpan
                   </button>
-                  <button type="button" className="btn btn-secondary" disabled={isSaving} onClick={() => runSave(() => removeMediaItem(item.id), 'Media berhasil dihapus.')}>
+                  <button type="button" className="btn btn-secondary" disabled={isSaving} onClick={async () => {
+                    if (await runSave(() => removeMediaItem(item.id), 'Media berhasil dihapus.')) {
+                      setMediaItems((current) => current.filter((entry) => entry.id !== item.id));
+                    }
+                  }}>
                     <Trash2 style={{ width: 18, height: 18 }} /> Hapus
                   </button>
                 </div>
@@ -319,14 +387,39 @@ export default function Admin() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.8rem' }}>
                   <Field label="Tag" value={item.tag} onChange={(value) => setHashtags((current) => current.map((entry) => entry.id === item.id ? { ...entry, tag: value } : entry))} />
                   <Field label="Deskripsi" value={item.description} onChange={(value) => setHashtags((current) => current.map((entry) => entry.id === item.id ? { ...entry, description: value } : entry))} />
-                  <Field label="Color" value={item.color} onChange={(value) => setHashtags((current) => current.map((entry) => entry.id === item.id ? { ...entry, color: value } : entry))} />
+                  <label style={{ display: 'grid', gap: '0.45rem' }}>
+                    <span className="subhead" style={{ color: 'var(--c-text-muted)' }}>Warna</span>
+                    <div style={{ display: 'flex', gap: '0.6rem' }}>
+                      <select 
+                        value={item.color} 
+                        onChange={(event) => setHashtags((current) => current.map((entry) => entry.id === item.id ? { ...entry, color: event.target.value } : entry))} 
+                        style={{ flex: 1, border: '3px solid var(--c-text)', borderRadius: '16px', padding: '0.8rem 0.9rem', fontWeight: 700, background: 'var(--c-white)' }}
+                      >
+                        <option value="var(--c-pink)">Pink (Default)</option>
+                        <option value="var(--c-purple)">Purple</option>
+                        <option value="var(--c-blue)">Blue</option>
+                        <option value="var(--c-yellow)">Yellow</option>
+                        <option value="var(--c-orange)">Orange</option>
+                        <option value="var(--c-emerald)">Emerald</option>
+                        <option value="var(--c-cyan)">Cyan</option>
+                        {availableColors.map(c => (
+                          <option key={c.value} value={c.value}>{c.name}</option>
+                        ))}
+                      </select>
+                      <div style={{ width: 48, borderRadius: '12px', border: '3px solid var(--c-text)', background: item.color }} />
+                    </div>
+                  </label>
                   <Field label="Urutan" value={item.sort_order} onChange={(value) => setHashtags((current) => current.map((entry) => entry.id === item.id ? { ...entry, sort_order: Number(value) || 0 } : entry))} type="number" />
                 </div>
                 <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
                   <button type="button" className="btn btn-primary" disabled={isSaving} onClick={() => runSave(() => saveHashtagItem(item), 'Hashtag berhasil disimpan.')}>
                     <Save style={{ width: 18, height: 18 }} /> Simpan
                   </button>
-                  <button type="button" className="btn btn-secondary" disabled={isSaving} onClick={() => runSave(() => removeHashtagItem(item.id), 'Hashtag berhasil dihapus.')}>
+                  <button type="button" className="btn btn-secondary" disabled={isSaving} onClick={async () => {
+                    if (await runSave(() => removeHashtagItem(item.id), 'Hashtag berhasil dihapus.')) {
+                      setHashtags((current) => current.filter((entry) => entry.id !== item.id));
+                    }
+                  }}>
                     <Trash2 style={{ width: 18, height: 18 }} /> Hapus
                   </button>
                 </div>
@@ -346,14 +439,39 @@ export default function Admin() {
                   <Field label="Label" value={item.label} onChange={(value) => setShowMetrics((current) => current.map((entry) => entry.id === item.id ? { ...entry, label: value } : entry))} />
                   <Field label="Value" value={item.value} onChange={(value) => setShowMetrics((current) => current.map((entry) => entry.id === item.id ? { ...entry, value: value } : entry))} />
                   <Field label="Deskripsi" value={item.description} onChange={(value) => setShowMetrics((current) => current.map((entry) => entry.id === item.id ? { ...entry, description: value } : entry))} />
-                  <Field label="Color" value={item.color} onChange={(value) => setShowMetrics((current) => current.map((entry) => entry.id === item.id ? { ...entry, color: value } : entry))} />
+                  <label style={{ display: 'grid', gap: '0.45rem' }}>
+                    <span className="subhead" style={{ color: 'var(--c-text-muted)' }}>Warna</span>
+                    <div style={{ display: 'flex', gap: '0.6rem' }}>
+                      <select 
+                        value={item.color} 
+                        onChange={(event) => setShowMetrics((current) => current.map((entry) => entry.id === item.id ? { ...entry, color: event.target.value } : entry))} 
+                        style={{ flex: 1, border: '3px solid var(--c-text)', borderRadius: '16px', padding: '0.8rem 0.9rem', fontWeight: 700, background: 'var(--c-white)' }}
+                      >
+                        <option value="var(--c-pink)">Pink</option>
+                        <option value="var(--c-purple)">Purple</option>
+                        <option value="var(--c-blue)">Blue (Default)</option>
+                        <option value="var(--c-yellow)">Yellow</option>
+                        <option value="var(--c-orange)">Orange</option>
+                        <option value="var(--c-emerald)">Emerald</option>
+                        <option value="var(--c-cyan)">Cyan</option>
+                        {availableColors.map(c => (
+                          <option key={c.value} value={c.value}>{c.name}</option>
+                        ))}
+                      </select>
+                      <div style={{ width: 48, borderRadius: '12px', border: '3px solid var(--c-text)', background: item.color }} />
+                    </div>
+                  </label>
                   <Field label="Urutan" value={item.sort_order} onChange={(value) => setShowMetrics((current) => current.map((entry) => entry.id === item.id ? { ...entry, sort_order: Number(value) || 0 } : entry))} type="number" />
                 </div>
                 <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
                   <button type="button" className="btn btn-primary" disabled={isSaving} onClick={() => runSave(() => saveShowMetricItem(item), 'Show stat berhasil disimpan.')}>
                     <Save style={{ width: 18, height: 18 }} /> Simpan
                   </button>
-                  <button type="button" className="btn btn-secondary" disabled={isSaving} onClick={() => runSave(() => removeShowMetricItem(item.id), 'Show stat berhasil dihapus.')}>
+                  <button type="button" className="btn btn-secondary" disabled={isSaving} onClick={async () => {
+                    if (await runSave(() => removeShowMetricItem(item.id), 'Show stat berhasil dihapus.')) {
+                      setShowMetrics((current) => current.filter((entry) => entry.id !== item.id));
+                    }
+                  }}>
                     <Trash2 style={{ width: 18, height: 18 }} /> Hapus
                   </button>
                 </div>
