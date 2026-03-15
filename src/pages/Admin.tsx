@@ -173,6 +173,38 @@ export default function Admin() {
     await supabase.auth.signOut();
   }
 
+  async function handleImportDefaults(type: 'gallery' | 'media' | 'hashtags' | 'metrics') {
+    const { 
+      fallbackGallery, 
+      fallbackMedia, 
+      fallbackHashtags, 
+      fallbackShowMetrics 
+    } = await import('../lib/cms');
+
+    let itemsToSave: any[] = [];
+    let saveFn: (item: any) => Promise<void>;
+
+    if (type === 'gallery') { itemsToSave = fallbackGallery; saveFn = (item) => import('../lib/cms').then(m => m.saveGalleryItem(item)); }
+    else if (type === 'media') { itemsToSave = fallbackMedia; saveFn = (item) => import('../lib/cms').then(m => m.saveMediaItem(item)); }
+    else if (type === 'hashtags') { itemsToSave = fallbackHashtags; saveFn = (item) => import('../lib/cms').then(m => m.saveHashtagItem(item)); }
+    else { itemsToSave = fallbackShowMetrics; saveFn = (item) => import('../lib/cms').then(m => m.saveShowMetricItem(item)); }
+
+    setStatusMessage(`Sedang mengimpor data ${type}...`);
+    setIsSaving(true);
+
+    try {
+      for (const item of itemsToSave) {
+        await saveFn(item);
+      }
+      await reloadAll();
+      setStatusMessage(`Berhasil mengimpor ${itemsToSave.length} data ${type}.`);
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : 'Gagal impor data');
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   async function runSave(action: () => Promise<void>, successMessage: string): Promise<boolean> {
     try {
       setIsSaving(true);
@@ -330,9 +362,16 @@ export default function Admin() {
                 </div>
               </div>
             ))}
-            <button type="button" className="btn btn-secondary" onClick={() => setGalleryItems((current) => [...current, { id: uid(), label: 'Foto Levi', image_url: '', sort_order: current.length + 1 }])}>
-              <ImagePlus style={{ width: 18, height: 18 }} /> Tambah Gambar
-            </button>
+            <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setGalleryItems((current) => [...current, { id: uid(), label: 'Foto Levi', image_url: '', sort_order: current.length + 1 }])}>
+                <ImagePlus style={{ width: 18, height: 18 }} /> Tambah Gambar
+              </button>
+              {galleryItems.length <= 1 && (
+                <button type="button" className="btn btn-secondary" style={{ background: '#f0f0f0' }} onClick={() => handleImportDefaults('gallery')}>
+                  Muat Gambar Bawaan
+                </button>
+              )}
+            </div>
           </div>
         </SectionShell>
 
@@ -374,9 +413,16 @@ export default function Admin() {
                 </div>
               </div>
             ))}
-            <button type="button" className="btn btn-secondary" onClick={() => setMediaItems((current) => [...current, { id: uid(), type: 'video', title: '', source: 'YouTube', date_label: '', thumb_url: '', url: '', sort_order: current.length + 1 }])}>
-              <Newspaper style={{ width: 18, height: 18 }} /> Tambah Media / Artikel
-            </button>
+            <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setMediaItems((current) => [...current, { id: uid(), type: 'video', title: '', source: 'YouTube', date_label: '', thumb_url: '', url: '', sort_order: current.length + 1 }])}>
+                <Newspaper style={{ width: 18, height: 18 }} /> Tambah Media / Artikel
+              </button>
+              {mediaItems.length <= 1 && (
+                <button type="button" className="btn btn-secondary" style={{ background: '#f0f0f0' }} onClick={() => handleImportDefaults('media')}>
+                  Muat Media Bawaan
+                </button>
+              )}
+            </div>
           </div>
         </SectionShell>
 
@@ -425,9 +471,16 @@ export default function Admin() {
                 </div>
               </div>
             ))}
-            <button type="button" className="btn btn-secondary" onClick={() => setHashtags((current) => [...current, { id: uid(), tag: '#HashtagBaru', description: '', color: 'var(--c-pink)', sort_order: current.length + 1 }])}>
-              <Hash style={{ width: 18, height: 18 }} /> Tambah Hashtag
-            </button>
+            <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setHashtags((current) => [...current, { id: uid(), tag: '#HashtagBaru', description: '', color: 'var(--c-pink)', sort_order: current.length + 1 }])}>
+                <Hash style={{ width: 18, height: 18 }} /> Tambah Hashtag
+              </button>
+              {hashtags.length <= 1 && (
+                <button type="button" className="btn btn-secondary" style={{ background: '#f0f0f0' }} onClick={() => handleImportDefaults('hashtags')}>
+                  Muat Hashtag Bawaan
+                </button>
+              )}
+            </div>
           </div>
         </SectionShell>
 
@@ -477,9 +530,16 @@ export default function Admin() {
                 </div>
               </div>
             ))}
-            <button type="button" className="btn btn-secondary" onClick={() => setShowMetrics((current) => [...current, { id: uid(), label: 'Metric Baru', value: '0', description: '', color: 'var(--c-blue)', sort_order: current.length + 1 }])}>
-              <LayoutDashboard style={{ width: 18, height: 18 }} /> Tambah Metric
-            </button>
+            <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setShowMetrics((current) => [...current, { id: uid(), label: 'Metric Baru', value: '0', description: '', color: 'var(--c-blue)', sort_order: current.length + 1 }])}>
+                <LayoutDashboard style={{ width: 18, height: 18 }} /> Tambah Metric
+              </button>
+              {showMetrics.length <= 1 && (
+                <button type="button" className="btn btn-secondary" style={{ background: '#f0f0f0' }} onClick={() => handleImportDefaults('metrics')}>
+                  Muat Default Stats
+                </button>
+              )}
+            </div>
           </div>
         </SectionShell>
       </div>

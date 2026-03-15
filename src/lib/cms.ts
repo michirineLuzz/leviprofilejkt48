@@ -38,7 +38,7 @@ export type ShowMetricItem = {
 
 type InsertPayload<T> = Omit<T, 'id'> & { id?: string };
 
-const fallbackHashtags: HashtagItem[] = [
+export const fallbackHashtags: HashtagItem[] = [
   { id: '1', tag: '#SobatSahur', description: 'Tag untuk sahur', color: 'var(--c-pink)', sort_order: 1 },
   { id: '2', tag: '#LeVriday', description: 'Tag untuk hari Jumat', color: 'var(--c-purple)', sort_order: 2 },
   { id: '3', tag: '#TakjilLevi', description: 'Tag untuk berbuka puasa', color: 'var(--c-blue)', sort_order: 3 },
@@ -48,7 +48,7 @@ const fallbackHashtags: HashtagItem[] = [
   { id: '7', tag: '#SobatYuhu', description: 'Tag untuk menyapa Levi di X', color: 'var(--c-cyan)', sort_order: 7 },
 ];
 
-const fallbackShowMetrics: ShowMetricItem[] = [
+export const fallbackShowMetrics: ShowMetricItem[] = [
   { id: 'total-show', label: 'Total Show', value: '77', description: 'Penampilan di JKT48 Theater', color: 'var(--c-pink)', sort_order: 1 },
   { id: 'setlist', label: 'Setlist Dilakukan', value: '6', description: 'Berbagai setlist berbeda', color: 'var(--c-purple)', sort_order: 2 },
   { id: 'senshuuraku', label: 'Senshuuraku', value: '2', description: 'Show penutup setlist', color: 'var(--c-blue)', sort_order: 3 },
@@ -56,14 +56,14 @@ const fallbackShowMetrics: ShowMetricItem[] = [
   { id: 'mv-terlibat', label: 'MV Terlibat', value: '1', description: 'Music Video resmi', color: 'var(--c-orange)', sort_order: 5 },
 ];
 
-const fallbackGallery: GalleryItem[] = GALLERY.map((item, index) => ({
+export const fallbackGallery: GalleryItem[] = GALLERY.map((item, index) => ({
   id: String(index + 1),
   image_url: item.src,
   label: item.label,
   sort_order: index + 1,
 }));
 
-const fallbackMedia: MediaItem[] = MEDIA_ITEMS.map((item, index) => ({
+export const fallbackMedia: MediaItem[] = MEDIA_ITEMS.map((item, index) => ({
   id: String(index + 1),
   type: item.type,
   title: item.title,
