@@ -8,6 +8,7 @@ const NAV_LINKS = [
     { name: 'Galeri', to: '/gallery' },
     { name: 'Media', to: '/media' },
     { name: 'Jadwal', to: '/schedule' },
+    { name: 'Live', to: '/live' },
 ];
 
 const SOCIALS = [
@@ -51,7 +52,7 @@ export default function Footer() {
                             {MEMBER.firstName} {MEMBER.lastName}
                         </h2>
                         <p style={{ fontWeight: 600, lineHeight: 1.75, color: 'var(--c-text-muted)', maxWidth: '38rem' }}>
-                            Landing page sederhana untuk lihat biodata, galeri, media, dan jadwal dalam satu tempat.
+                            Landing page sederhana untuk lihat biodata, galeri, media, jadwal, dan live status dalam satu tempat.
                         </p>
                     </div>
 

@@ -84,7 +84,6 @@ export default function Live() {
                     {loading ? (
                         <div className="card-bubbly" style={{ padding: '4rem' }}>
                             <div className="spin-anim" style={{ display: 'inline-block' }}>
-                                <Sparkles style={{ width: 48, height: 48, color: 'var(--c-yellow)' }} />
                             </div>
                             <p style={{ marginTop: '1rem', fontWeight: 800 }}>Mengecek status Levi...</p>
                         </div>
