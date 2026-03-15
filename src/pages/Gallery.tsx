@@ -143,7 +143,7 @@ export default function Gallery() {
                                         }}
                                     >
                                         <div style={{ aspectRatio: idx === 2 ? '1 / 1' : '4 / 5', overflow: 'hidden', borderRadius: '18px', border: '3px solid var(--c-text)' }}>
-                                            <motion.img src={photo.image_url} alt={photo.label} className="img-cover" whileHover={{ scale: 1.05 }} transition={{ duration: 0.35 }} />
+                                            <motion.img src={photo.image_url} alt={photo.label} className="img-cover" whileHover={{ scale: 1.05 }} transition={{ duration: 0.35 }} loading="lazy" />
                                         </div>
                                     </motion.div>
                                 );
@@ -185,6 +185,7 @@ export default function Gallery() {
                                     whileHover={{ y: -8, rotate: index % 2 === 0 ? -2 : 2 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => setActiveIndex(index)}
+                                    aria-label={`Lihat foto: ${item.label}`}
                                     style={{
                                         cursor: 'pointer',
                                         textAlign: 'left',
@@ -197,7 +198,7 @@ export default function Gallery() {
                                     }}
                                 >
                                     <div style={{ position: 'relative', aspectRatio: '4 / 5', overflow: 'hidden', borderRadius: '18px', border: '3px solid var(--c-text)', marginBottom: '0.9rem' }}>
-                                        <motion.img src={item.image_url} alt={item.label} className="img-cover" whileHover={{ scale: 1.06 }} transition={{ duration: 0.35 }} />
+                                        <motion.img src={item.image_url} alt={item.label} className="img-cover" whileHover={{ scale: 1.06 }} transition={{ duration: 0.35 }} loading="lazy" />
                                         <div
                                             style={{
                                                 position: 'absolute',

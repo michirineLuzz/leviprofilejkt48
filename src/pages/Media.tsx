@@ -137,6 +137,7 @@ export default function Media() {
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.transform = active ? 'translate(4px, 4px)' : 'translate(0)';
                                     }}
+                                    aria-label={`Filter: ${item.label}`}
                                     style={{
                                         cursor: 'pointer',
                                         display: 'inline-flex',
@@ -205,7 +206,7 @@ export default function Media() {
                             </div>
 
                             <div style={{ position: 'relative', borderRadius: '26px', overflow: 'hidden', border: '4px solid var(--c-text)', minHeight: '250px', background: '#fff1f6' }}>
-                                <motion.img src={featured.thumb_url} alt={featured.title} className="img-cover" whileHover={{ scale: 1.04 }} transition={{ duration: 0.35 }} />
+                                <motion.img src={featured.thumb_url} alt={`Thumbnail featured: ${featured.title}`} className="img-cover" whileHover={{ scale: 1.04 }} transition={{ duration: 0.35 }} loading="lazy" />
                                 <div
                                     style={{
                                         position: 'absolute',
@@ -252,7 +253,7 @@ export default function Media() {
                                 }}
                             >
                                 <div style={{ position: 'relative', aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: '20px', border: '3px solid var(--c-text)', marginBottom: '1rem', background: '#fff1f7' }}>
-                                    <motion.img src={item.thumb_url} alt={item.title} className="img-cover" whileHover={{ scale: 1.05 }} transition={{ duration: 0.35 }} />
+                                    <motion.img src={item.thumb_url} alt={`Thumbnail content: ${item.title}`} className="img-cover" whileHover={{ scale: 1.05 }} transition={{ duration: 0.35 }} loading="lazy" />
                                     <div
                                         style={{
                                             position: 'absolute',

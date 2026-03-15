@@ -180,8 +180,10 @@ export default function Navbar() {
                         style={{
                             position: 'absolute',
                             top: '100%',
-                            left: '1rem',
-                            right: '1rem',
+                            left: 'auto',
+                            right: '0',
+                            width: '280px',
+                            maxWidth: 'calc(100vw - 2rem)',
                             marginTop: '0.8rem',
                             display: 'none',
                         }}
@@ -190,50 +192,58 @@ export default function Navbar() {
                             style={{
                                 background: 'linear-gradient(180deg, #fffafd 0%, #fff6dc 100%)',
                                 border: '4px solid var(--c-text)',
-                                borderRadius: '28px',
-                                padding: '1.2rem',
-                                boxShadow: '10px 10px 0px var(--c-pink-light)',
+                                borderRadius: '32px',
+                                padding: '1.5rem',
+                                boxShadow: '12px 12px 0px var(--c-pink-light)',
                                 display: 'grid',
-                                gap: '0.75rem',
+                                gap: '0.8rem',
                             }}
                         >
                             <div
                                 style={{
-                                    display: 'inline-flex',
+                                    display: 'flex',
                                     alignItems: 'center',
+                                    justifyContent: 'center',
                                     gap: '0.5rem',
-                                    padding: '0.5rem 0.8rem',
-                                    borderRadius: '999px',
+                                    padding: '0.55rem 1rem',
+                                    borderRadius: '12px',
                                     border: '3px solid var(--c-text)',
                                     background: 'var(--c-white)',
-                                    width: 'fit-content',
+                                    width: '100%',
+                                    marginBottom: '0.4rem'
                                 }}
                             >
-                                <span className="subhead" style={{ color: 'var(--c-text)', margin: 0 }}>Quick Menu</span>
+                                <span className="subhead" style={{ color: 'var(--c-text)', margin: 0, fontSize: '0.85rem' }}>Quick Menu</span>
                             </div>
 
-                            {NAV_LINKS.map((link) => (
-                                <NavLink
-                                    key={link.name}
-                                    to={link.to}
-                                    style={({ isActive }) => ({
-                                        textDecoration: 'none',
-                                        padding: '0.95rem 1rem',
-                                        borderRadius: '18px',
-                                        border: '3px solid var(--c-text)',
-                                        background: isActive ? 'var(--c-blue)' : 'var(--c-white)',
-                                        color: isActive ? 'var(--c-white)' : 'var(--c-text)',
-                                        boxShadow: isActive ? 'none' : '4px 4px 0px var(--c-text)',
-                                        transform: isActive ? 'translate(4px, 4px)' : 'translate(0, 0)',
-                                        fontFamily: 'var(--font-head)',
-                                        fontWeight: 800,
-                                        fontSize: '1rem',
-                                        textAlign: 'center',
-                                    })}
-                                >
-                                    {link.name}
-                                </NavLink>
-                            ))}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.8rem' }}>
+                                {NAV_LINKS.map((link) => (
+                                    <NavLink
+                                        key={link.name}
+                                        to={link.to}
+                                        style={({ isActive }) => ({
+                                            textDecoration: 'none',
+                                            padding: '1.25rem',
+                                            borderRadius: '16px',
+                                            border: '4px solid var(--c-text)',
+                                            background: isActive ? 'var(--c-blue)' : 'var(--c-white)',
+                                            color: isActive ? 'var(--c-white)' : 'var(--c-text)',
+                                            boxShadow: isActive ? 'none' : '6px 6px 0px var(--c-text)',
+                                            transform: isActive ? 'translate(6px, 6px)' : 'translate(0, 0)',
+                                            fontFamily: 'var(--font-head)',
+                                            fontWeight: 900,
+                                            fontSize: '1.2rem',
+                                            textAlign: 'center',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                                        })}
+                                    >
+                                        {link.name}
+                                    </NavLink>
+                                ))}
+                            </div>
                         </div>
                     </motion.div>
                 )}

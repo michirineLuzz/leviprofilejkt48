@@ -248,11 +248,11 @@ export default function About() {
                                 animate="show"
                                 style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}
                             >
-                                <motion.span variants={ITEM_REVEAL} className="pill pill-purple">
-                                    <Sparkles style={{ width: 14, height: 14 }} /> Profile File
+                                <motion.span aria-label="Profile Folder" variants={ITEM_REVEAL} className="pill pill-purple">
+                                    <Sparkles aria-hidden="true" style={{ width: 14, height: 14 }} /> Profile File
                                 </motion.span>
-                                <motion.span variants={ITEM_REVEAL} className="pill" style={{ background: 'var(--c-yellow)' }}>
-                                    <Star style={{ width: 14, height: 14 }} /> {MEMBER.generation}
+                                <motion.span aria-label={`Generation: ${MEMBER.generation}`} variants={ITEM_REVEAL} className="pill" style={{ background: 'var(--c-yellow)' }}>
+                                    <Star aria-hidden="true" style={{ width: 14, height: 14 }} /> {MEMBER.generation}
                                 </motion.span>
                             </motion.div>
 
@@ -329,7 +329,14 @@ export default function About() {
                             <motion.div whileHover={{ y: -8, rotate: -1.5 }}>
                                 <div className="img-sticker" style={{ background: 'var(--c-white)', boxShadow: '12px 12px 0px var(--c-blue)' }}>
                                     <div style={{ overflow: 'hidden', aspectRatio: '3 / 4', background: 'linear-gradient(180deg, #ffd7e6 0%, #fff 100%)' }}>
-                                        <motion.img src={MEMBER.bioImg} alt={`${MEMBER.firstName} ${MEMBER.lastName}`} className="img-cover" whileHover={{ scale: 1.04 }} transition={{ duration: 0.35 }} />
+                                        <motion.img
+                                            src={MEMBER.bioImg}
+                                            alt={`Foto profile resmi ${MEMBER.firstName} ${MEMBER.lastName}`}
+                                            className="img-cover"
+                                            whileHover={{ scale: 1.04 }}
+                                            transition={{ duration: 0.35 }}
+                                            loading="lazy"
+                                        />
                                     </div>
                                     <div
                                         style={{
@@ -865,13 +872,13 @@ export default function About() {
                         className="about-showcase-grid"
                         style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
-                            gap: '1.25rem',
+                            gap: '2rem',
                             alignItems: 'stretch',
-                            maxWidth: '1120px',
+                            maxWidth: '1280px',
                             margin: '0 auto',
                             position: 'relative',
                             zIndex: 1,
+                            padding: '1rem 12px 12px 1rem', // Space for larger shadows
                         }}
                     >
                         {showStats.map((item, index) => (
@@ -880,15 +887,16 @@ export default function About() {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                whileHover={{ y: -8, rotate: index % 2 === 0 ? -1 : 1 }}
+                                whileHover={{ y: -12, rotate: index % 2 === 0 ? -2 : 2 }}
                                 transition={{ delay: index * 0.07 }}
                                 className="card-bubbly"
                                 style={{
-                                    padding: '2rem 1.25rem',
+                                    padding: '3rem 1.5rem',
+                                    width: '100%',
                                     textAlign: 'center',
-                                    boxShadow: `8px 8px 0px ${item.color}`,
+                                    boxShadow: `12px 12px 0px ${item.color}`,
                                     background: 'var(--c-white)',
-                                    minHeight: '220px',
+                                    minHeight: '280px',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'center',
@@ -903,12 +911,12 @@ export default function About() {
                                     position: 'absolute',
                                     right: '-5%',
                                     bottom: '-15%',
-                                    fontSize: 'clamp(6rem, 12vw, 8rem)',
+                                    fontSize: 'clamp(8rem, 15vw, 10rem)',
                                     fontWeight: 900,
+                                    fontFamily: 'var(--font-head)',
                                     color: item.color,
                                     opacity: 0.12,
                                     pointerEvents: 'none',
-                                    fontFamily: 'var(--font-head)',
                                     zIndex: -1,
                                     lineHeight: 1,
                                 }}>
@@ -918,28 +926,28 @@ export default function About() {
                                 {/* Decorative Mini Dot */}
                                 <div style={{
                                     position: 'absolute',
-                                    top: '1.25rem',
-                                    left: '1.25rem',
-                                    width: '12px',
-                                    height: '12px',
+                                    top: '1.5rem',
+                                    left: '1.5rem',
+                                    width: '16px',
+                                    height: '16px',
                                     borderRadius: '50%',
                                     background: item.color,
-                                    border: '2px solid var(--c-text)',
+                                    border: '3px solid var(--c-text)',
                                 }} />
 
                                 <p style={{
                                     fontFamily: 'var(--font-head)',
                                     fontWeight: 900,
-                                    fontSize: 'clamp(2.4rem, 5vw, 3.2rem)',
+                                    fontSize: 'clamp(3rem, 6vw, 4rem)',
                                     lineHeight: 1,
                                     color: item.color,
-                                    marginBottom: '0.75rem',
-                                    WebkitTextStroke: '1.5px var(--c-text)',
+                                    marginBottom: '1rem',
+                                    WebkitTextStroke: '2px var(--c-text)',
                                 }}>
                                     {item.value}
                                 </p>
-                                <p className="head" style={{ fontSize: '1.05rem', marginBottom: '0.4rem' }}>{item.label}</p>
-                                <p style={{ color: 'var(--c-text-muted)', fontSize: '0.82rem', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+                                <p className="head" style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{item.label}</p>
+                                <p style={{ color: 'var(--c-text-muted)', fontSize: '0.9rem', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                                     {item.description}
                                 </p>
                             </motion.div>
