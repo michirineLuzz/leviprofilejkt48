@@ -94,7 +94,7 @@ export default function Home() {
 
         async function loadLiveStatus() {
             try {
-                const status = await fetchLeviLiveStatus(['Levi', 'Michelle Levia', 'jkt48_levi']);
+                const status = await fetchLeviLiveStatus(['Levi', 'Michelle Levia', 'jkt48_levi', 'JKT48_Levi']);
                 if (isMounted) {
                     setLiveStatus(status);
                 }

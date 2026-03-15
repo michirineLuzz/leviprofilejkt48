@@ -42,18 +42,27 @@ function findFirstString(record: UnknownRecord, keys: string[]) {
 }
 
 function memberMatches(record: UnknownRecord, memberNames: string[]) {
-  const candidates = [
-    findFirstString(record, ['name', 'member_name', 'main_name', 'title']),
-    findFirstString(record, ['stage_name', 'stageName']),
-    findFirstString(record, ['idol_name']),
-    findFirstString(record, ['idn_username', 'username']),
-    findFirstString(record, ['room_url_key', 'url_key']),
-  ]
-    .map(normalizeText)
-    .filter(Boolean);
+  const getValues = (obj: UnknownRecord): string[] => {
+    let results: string[] = [];
+    const keysToSearch = ['name', 'member_name', 'main_name', 'title', 'username', 'idn_username', 'room_url_key', 'url_key', 'slug'];
 
+    for (const key of keysToSearch) {
+      if (typeof obj[key] === 'string') results.push(obj[key] as string);
+    }
+
+    // Cek nested object spt 'user' atau 'creator'
+    if (isObject(obj.user)) results = [...results, ...getValues(obj.user as UnknownRecord)];
+    if (isObject(obj.creator)) results = [...results, ...getValues(obj.creator as UnknownRecord)];
+
+    return results;
+  };
+
+  const candidates = getValues(record).map(normalizeText).filter(Boolean);
   const targets = memberNames.map(normalizeText).filter(Boolean);
-  return candidates.some((candidate) => targets.some((target) => candidate.includes(target) || target.includes(candidate)));
+
+  return candidates.some((candidate) =>
+    targets.some((target) => candidate.includes(target) || target.includes(candidate))
+  );
 }
 
 function buildAbsoluteUrl(url: string) {
@@ -73,11 +82,22 @@ function extractIdnLiveStatus(payload: unknown, memberNames: string[]): LiveStat
       continue;
     }
 
+    // Ambil data dari nested 'user' kalau ada (ciri khas IDN)
+    const user = isObject(item.user) ? (item.user as UnknownRecord) : null;
+    const username = toStringValue(user?.username || item.username || item.idn_username);
+    const slug = toStringValue(item.slug);
+    const title = findFirstString(item, ['title']) || findFirstString(user || {}, ['name', 'username']) || 'Levi sedang live di IDN';
+
+    // Format URL IDN: https://www.idn.app/username/live/slug
+    const url = username && slug
+      ? `https://www.idn.app/${username}/live/${slug}`
+      : findFirstString(item, ['url', 'link', 'share_url']);
+
     return {
       isLive: true,
       platform: 'IDN Live',
-      title: findFirstString(item, ['title', 'name', 'member_name']) || 'Levi sedang live di IDN',
-      url: findFirstString(item, ['url', 'share_url', 'web_url', 'link']) || undefined,
+      title,
+      url: url || undefined,
     };
   }
 
